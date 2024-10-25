@@ -5,7 +5,7 @@ import dependencyInjectionLoader from './dependency-injection.loader';
 import mysqlLoader from "./mysql.loader";
 import OpenAILoader from "./openAi";
 
-export default async ({ app, server }: { app: Application, server: http.Server }) => {
+export default async ({ app }: { app: Application }) => {
     const pool = await mysqlLoader();
     console.log('promise mysql2 loaded successfully 😊');
 
