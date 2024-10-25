@@ -15,4 +15,4 @@ import { Application } from "express";
         .catch((error : any) => {
             console.error("server error");
         })
-})();
+})(); 
