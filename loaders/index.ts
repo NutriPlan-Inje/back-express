@@ -9,12 +9,11 @@ export default async ({ app, server }: { app: Application, server: http.Server }
     const pool = await mysqlLoader();
     console.log('promise mysql2 loaded successfully 😊');
 
-    await dependencyInjectionLoader({ pool });
-    console.log('DI loaded successfully 😊');
-    
     const openai = await openaiLoader();
     console.log('openai loaded successfully 😊');
 
+    await dependencyInjectionLoader({ pool, openai });
+    console.log('DI loaded successfully 😊');
     
     await expressLoader({ app });
     console.log('express loaded successfully 😊');

@@ -1,5 +1,7 @@
 import createApp from './app';
 import dotenv from 'dotenv';
+import Container from 'typedi';
+import ChatService from './services/chat.service';
 
 dotenv.config();
 const PORT = process.env.PORT || 3000;
