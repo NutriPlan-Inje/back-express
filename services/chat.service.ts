@@ -53,11 +53,3 @@ export default class ChatService {
     }
     
 }
-
-async function main() {
-    // 질문하고 응답 받기
-    const question = "다이어트를 하려면 어떻게 해야 할까"
-    const response = Container.get(ChatService).askQuestion(null,question);
-    console.log("GPT 응답:", response);
-}  
-main();
