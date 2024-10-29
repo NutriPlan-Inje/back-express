@@ -11,5 +11,7 @@ const PORT = process.env.PORT || 3000;
 
     server.listen(PORT, () => {
         console.log(`${PORT} 포트에서 서버가 시작되었습니다`);
+        //const res = Container.get(ChatService).askQuestion(null, "살을 어떻게 빼나요?");
+        //console.log(res);
     });
 })();
