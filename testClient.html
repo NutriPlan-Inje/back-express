@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socket.IO Chat Test Client</title>
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            text-align: center;
+        }
+        #messages {
+            margin-top: 20px;
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        input {
+            margin-top: 10px;
+            padding: 10px;
+            width: 80%;
+        }
+        button {
+            padding: 10px;
+        }
+        p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chat Room Test Client</h1>
+
+    <div>
+        <button id="createRoomBtn">Create & Join Room</button>
+    </div>
+
+    <div id="roomInfo"></div>
+
+    <div id="messages"></div>
+
+    <input type="text" id="messageInput" placeholder="Type your message" />
+    <button id="sendBtn">Send</button>
+
+    <script>
+        // Socket.IO 서버에 연결 (서버 주소는 필요에 맞게 수정)
+        const socket = io("http://localhost:8080", { path: "/bot" });
+
+        const messagesDiv = document.getElementById("messages");
+        const messageInput = document.getElementById("messageInput");
+        const roomInfoDiv = document.getElementById("roomInfo");
+
+        let currentRoomId = null; // 현재 참가한 방 ID 저장
+
+        // 1️⃣ 방 생성 버튼 클릭 이벤트 처리
+        document.getElementById("createRoomBtn").addEventListener("click", () => {
+            console.log("Creating a new room...");
+            socket.emit("create room"); // 서버에 방 생성 요청
+        });
+
+        // 2️⃣ 서버로부터 방 생성 응답 처리 (방 생성 후 자동 참가)
+        socket.on("room created", (data) => {
+            currentRoomId = data.roomId; // 생성된 방 ID 저장
+            console.log(`Room created with ID: ${currentRoomId}`);
+
+            // 생성된 방에 자동으로 참가 요청
+            socket.emit("join room", currentRoomId);
+        });
+
+        // 3️⃣ 서버로부터 방 참가 성공 응답 처리
+        socket.on("room joined", (data) => {
+            roomInfoDiv.innerHTML = `<p>Joined Room: ${data.roomId}</p>`;
+            logMessage(`✅ Successfully joined room: ${data.roomId}`);
+        });
+
+        // 4️⃣ 메시지 보내기 버튼 이벤트 처리
+        document.getElementById("sendBtn").addEventListener("click", () => {
+            const msg = messageInput.value.trim();
+            if (msg && currentRoomId) {
+                console.log(`Sending message: ${msg}`);
+                socket.emit("chat message", { roomId: currentRoomId, msg }); // 서버에 메시지 전송
+                logMessage(`🧑‍💻 You: ${msg}`); // 메시지를 화면에 표시
+                messageInput.value = ""; // 입력 필드 초기화
+            } else {
+                logMessage("⚠️ Please enter a message and ensure you're in a room.");
+            }
+        });
+
+        // 5️⃣ 서버로부터 메시지 수신 처리
+        socket.on("chat message", (data) => {
+            console.log("Received message from AI Bot:", data);
+            logMessage(`🤖 AI Bot: ${data.answer}`);
+        });
+
+        // 6️⃣ 에러 처리
+        socket.on("error", (error) => {
+            console.error("Socket error:", error);
+            logMessage(`❌ Error: ${error.message || error}`);
+        });
+
+        // 7️⃣ 로그 메시지를 화면에 표시하는 함수
+        function logMessage(message) {
+            const p = document.createElement("p");
+            p.textContent = message;
+            messagesDiv.appendChild(p);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+    </script>
+</body>
+</html>
