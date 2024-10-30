@@ -6,12 +6,12 @@
     "version": "1.0.0"
   },
   "host": "localhost:8080",
-  "basePath": "/node",
+  "basePath": "/",
   "schemes": [
     "http"
   ],
   "paths": {
-    "/dietPlan/{u_id}": {
+    "/node/dietPlan/{u_id}": {
       "get": {
         "tags": ["Diet Plan"],  
         "summary": "Get diet plan by user ID and date",
@@ -106,7 +106,7 @@
         }
       }
     },
-    "/dietPlan": {
+    "/node/dietPlan": {
       "delete": {
         "tags": ["Diet Plan"],  
         "summary": "Delete diet plan by dietPlanID",
@@ -154,7 +154,7 @@
       }
     },
 
-    "/foodInfo/{f_id}": {
+    "/node/foodInfo/{f_id}": {
       "get": {
         "tags": ["Food Info"],  
         "summary": "Get food information by food ID",
@@ -231,7 +231,7 @@
       }
     },
 
-    "/foodInfo": {
+    "/node/foodInfo": {
       "delete": {
         "tags": ["Food Info"],  
         "summary": "Delete food information by food ID (얘는 안 쓸 듯)",
@@ -274,7 +274,7 @@
         }
       }
     },
-    "/macronutrientRatio/day/{u_id}": {
+    "/node/macronutrientRatio/day/{u_id}": {
       "get": {
         "tags": ["Macronutrient Ratio"],
         "summary": "Get macronutrient ratio by user ID and date for a day",
@@ -382,7 +382,7 @@
         }
       }
     },
-    "/macronutrientRatio/week/{u_id}": {
+    "/node/macronutrientRatio/week/{u_id}": {
       "get": {
         "tags": ["Macronutrient Ratio"],
         "summary": "Get macronutrient ratio by user ID and date for a week",
@@ -503,7 +503,7 @@
     }
 
     ,
-    "/macronutrientRatio/evaluate/{u_id}": {
+    "/node/macronutrientRatio/evaluate/{u_id}": {
       "get": {
         "tags": ["Macronutrient Ratio"],
         "summary": "Evaluate macronutrient intake compared to recommendation",
@@ -551,15 +551,15 @@
                     "macronutrientRecommendation": {
                       "type": "object",
                       "properties": {
-                        "carbohydrate": {
+                        "recomendCarbohydrate": {
                           "type": "integer",
                           "example": 258
                         },
-                        "protein": {
+                        "recomendProtein": {
                           "type": "integer",
                           "example": 103
                         },
-                        "fat": {
+                        "recomendFat": {
                           "type": "integer",
                           "example": 69
                         }
@@ -582,18 +582,18 @@
                         }
                       }
                     },
-                    "result": {
+                    "evaluate": {
                       "type": "object",
                       "properties": {
-                        "carbohydrate": {
+                        "evaluateCarbohydrate": {
                           "type": "string",
                           "example": "탄수화물이 부족합니다"
                         },
-                        "protein": {
+                        "evaluateProtein": {
                           "type": "string",
                           "example": "단백질이 부족합니다"
                         },
-                        "fat": {
+                        "evaluateFat": {
                           "type": "string",
                           "example": "지방이 부족합니다"
                         }
