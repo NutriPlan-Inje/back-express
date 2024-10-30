@@ -12,7 +12,6 @@ export class DietPlanController {
 
     findDietPlanByDate = async (req: Request, res : Response, next : NextFunction) => {
         try {
-            //TODO:param으로 고치기
             const date : string = req.body.date;
             const u_id : number = parseInt(req.params.u_id);
             const dietPlanResponseDTO : DietPlanResponseDTO = await this.dietPlanService.findDietPlanByDateAndUid({ date, u_id  });

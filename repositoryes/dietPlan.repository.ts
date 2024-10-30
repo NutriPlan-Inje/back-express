@@ -10,7 +10,7 @@ export default class DietPlanRepository extends Repository{
     }
     //[ ] 조회 삭제
     async findDietPlanByDateAndUid( { date, u_id} : { date : string, u_id : number }) : Promise<DietplanDTO[]> {
-        const query : string = "SELECT * FROM userDietplan WHERE DATE(date) = ? AND user_id = ?";
+        const query : string = "SELECT * FROM userDietplan WHERE DATE(date) = ? AND user_id = ? ORDER BY mealTime ASC";
         const result : DietplanDTO[]  = await this.executeQuery(query, [date, u_id]);
         
         return result;

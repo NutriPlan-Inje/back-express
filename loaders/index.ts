@@ -1,24 +1,31 @@
 // src/loaders/index.ts
-import { Application } from "express";
-import http from "http";
-import { Pool } from "mysql2/promise";
-import OpenAI from "openai";
-import expressLoader from "./express.loader";
-import dependencyInjectionLoader from "./dependency-injection.loader";
+import expressLoader from './express.loader';  // Express 설정
+import dependencyInjectionLoader from './dependency-injection.loader';  // 의존성 로더
+import mysqlLoader from './mysql.loader';  // MySQL 연결 로더
+import openaiLoader from './openai.loader';  // OpenAI 설정 로더
+import chatSocket from '../io/index';  // Socket.IO 설정
+import http from 'http';
+import { Application } from 'express';
 
-interface LoaderOptions {
+export default async function loaders({
+    app,
+    server,
+}: {
     app: Application;
     server: http.Server;
-    pool: Pool;
-    openai: OpenAI;
-}
+}): Promise<void> {
+    // 1️⃣ MySQL 및 OpenAI 인스턴스 로드
+    const pool = await mysqlLoader();
+    const openai = await openaiLoader();
 
-export default async function loaders({ app, server, pool, openai }: LoaderOptions) {
-    // 의존성 주입 로더 실행
+    // 2️⃣ 의존성 주입 (TypeDI 컨테이너에 등록)
     await dependencyInjectionLoader({ pool, openai });
 
-    // Express 로더 실행
+    // 3️⃣ Express 설정 적용
     await expressLoader({ app });
 
-    console.log("All loaders initialized successfully!");
+    // 4️⃣ Socket.IO 서버 초기화
+    chatSocket(server);
+
+    console.log('All loaders initialized successfully!');
 }

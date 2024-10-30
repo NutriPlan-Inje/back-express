@@ -4,7 +4,7 @@ import {  MacronutrientRatioForDayResponseDTO, MacronutrientRatioForWeekResponse
 import DietPlanRepository from "../repositoryes/dietPlan.repository";
 import FoodInfoRepository from "../repositoryes/foodInfo.repository";
 import DietplanDTO from "../dto/response/dietPlan";
-import { EachKcal, DailyMacronutrientSummary, WeekMacronutrientSummary, DailyKcal, MacronutrientType } from "../types/nutrient.type";
+import { EachKcal, DailyMacronutrientSummary, WeekMacronutrientSummary, DailyKcal, MacronutrientType, EvaluateMacronutrient, RecomendMacronutrientType } from "../types/nutrient.type";
 import UserRepository from "../repositoryes/user.repository";
 import UserDTO from "../dto/response/user";
 
@@ -75,43 +75,47 @@ export class NutrientsRatioServie {
         return result;
     }
 
+    private  calculateRecomendNutrition = ({ userBmr } : { userBmr : number }) :RecomendMacronutrientType=> {
+        const ACTIVITY_METABOLISM = 1.375
+
+        //TODO : 계산 같은 거는 함수로 뺴고 함수를 부르는 것이 가독성이 좋음 비즈니스 로직은 가독성이 중요
+        const recomendDailyEnergyExpenditure : number =  userBmr * ACTIVITY_METABOLISM; // 활동칼로리 - 가벼운 운동(주1-3회)을 기준
+
+        // 5:2:3 이 적정 비율
+        const recomendCarbohydrate : number = Math.round(recomendDailyEnergyExpenditure * 0.5 / 4);
+        const recomendProtein : number = Math.round(recomendDailyEnergyExpenditure * 0.2 / 4);
+        const recomendFat : number = Math.round(recomendDailyEnergyExpenditure * 0.3 / 9);
+
+        const result: RecomendMacronutrientType = {recomendCarbohydrate, recomendProtein, recomendFat}
+
+        return result;
+    }
+
+    private evaluateMacronutrient = ({ recomendMacronutrient, macronutrient } : { recomendMacronutrient : RecomendMacronutrientType,   macronutrient : MacronutrientType }) : EvaluateMacronutrient=> {;
+        const evaluateCarbohydrate : string = macronutrient.carbohydrate < recomendMacronutrient.recomendCarbohydrate ? "탄수화물이 부족합니다" : "탄수화물이 충분합니다";
+        const evaluateProtein : string = macronutrient.protein < recomendMacronutrient.recomendProtein ? "단백질이 부족합니다" : "단백질이 충분합니다";
+        const evaluateFat : string = macronutrient.fat < recomendMacronutrient.recomendFat ? "지방이 부족합니다" : "지방이 충분합니다.";
+
+        const result : EvaluateMacronutrient = {evaluateCarbohydrate, evaluateProtein, evaluateFat};
+
+        return result;
+    }
+
     async evaluateMacronutrientIntakeForDay({ u_id, date } : { u_id : number, date : string}) : Promise<MacronutrientRatioForDayResponseDTO>{
         //섭취한 영양 + 유저의 기초대사량
         const dietPlan : DietplanDTO[]= await this.dietPlanRepository.findDietPlanByDateAndUid({date, u_id});
         const macronutrient : MacronutrientType = await this.Macronutrient({ dietPlan })
         const userInfo : UserDTO = await this.userRepository.getUserInfoByUid({u_id});
         const userBmr = userInfo.bmr;
-        const ACTIVITY_METABOLISM = 1.375
         
+        const recomendMacronutrient : RecomendMacronutrientType = this.calculateRecomendNutrition({ userBmr });
+        const resultEvaluate : EvaluateMacronutrient = this.evaluateMacronutrient({ recomendMacronutrient, macronutrient});
 
-        //TODO : 계산 같은 거는 함수로 뺴고 함수를 부르는 것이 가독성이 좋음 비즈니스 로직은 가독성이 중요
-        const tdee : number =  userBmr * ACTIVITY_METABOLISM; // 활동칼로리 - 가벼운 운동(주1-3회)을 기준
-
-        // 5:2:3 이 적정 비율
-        const totalCarbohydrate = Math.round(tdee * 0.5 / 4);
-        const totalProtein = Math.round(tdee * 0.2 / 4);
-        const totalFat = Math.round(tdee * 0.3 / 9);
-        
-        const reaultCarbohydrate : string = macronutrient.carbohydrate < totalCarbohydrate ? "탄수화물이 부족합니다" : "탄수화물이 충분합니다";
-        const resultProtein : string = macronutrient.protein < totalProtein ? "단백질이 부족합니다" : "단백질이 충분합니다";
-        const resultFat : string = macronutrient.fat < totalFat ? "지방이 부족합니다" : "지방이 충분합니다.";
 
         const dailyMacronutrientSummary : DailyMacronutrientSummary = {
-            macronutrientRecommendation : {
-                carbohydrate : totalCarbohydrate,
-                protein : totalProtein,
-                fat : totalFat
-            },
-            intakeMacronutrient : {
-                carbohydrate : macronutrient.carbohydrate,
-                protein : macronutrient.protein,
-                fat : macronutrient.fat
-            },
-            result :  {
-                carbohydrate : reaultCarbohydrate,
-                protein : resultProtein,
-                fat : resultFat
-            }
+            macronutrientRecommendation : recomendMacronutrient,
+            intakeMacronutrient : macronutrient,
+            evaluate :  resultEvaluate
         }
 
 
