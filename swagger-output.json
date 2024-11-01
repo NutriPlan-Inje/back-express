@@ -11,7 +11,7 @@
     "http"
   ],
   "paths": {
-    "/node/dietPlan/{u_id}": {
+    "/node/dietPlan/{u_id}/{date}": {
       "get": {
         "tags": ["Diet Plan"],  
         "summary": "Get diet plan by user ID and date",
@@ -25,17 +25,11 @@
           },
           {
             "name": "date",
-            "in": "body",
-            "description": "Date to retrieve diet plan",
+            "in": "path",
+            "description": "Date to retrieve diet plan (Explain : 2024-09-24)",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "date": {
-                  "type": "string",
-                  "example": "2024-09-24"
-                }
-              }
+              "type": "string"
             }
           }
         ],
@@ -106,24 +100,18 @@
         }
       }
     },
-    "/node/dietPlan": {
+    "/node/dietPlan/{dietPlanID}": {
       "delete": {
         "tags": ["Diet Plan"],  
         "summary": "Delete diet plan by dietPlanID",
         "parameters": [
           {
             "name": "dietPlanID",
-            "in": "body",
+            "in": "path",
             "description": "dietPlanID to delete diet plan",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "dietPlan_id": {
-                  "type": "integer",
-                  "example": 4
-                }
-              }
+              "type": "object"
             }
           }
         ],
@@ -160,18 +148,12 @@
         "summary": "Get food information by food ID",
         "parameters": 
           {
-            "name": "date",
-            "in": "body",
-            "description": "Date to retrieve diet plan",
+            "name": "foodId",
+            "in": "path",
+            "description": "Date to retrieve diet plan (Explain : 2024-09-24)",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "date": {
-                  "type": "string",
-                  "example": "2024-09-24"
-                }
-              }
+              "type": "object"
             }
           },
         "responses": {
@@ -231,24 +213,18 @@
       }
     },
 
-    "/node/foodInfo": {
+    "/node/foodInfo/{:f_id}": {
       "delete": {
         "tags": ["Food Info"],  
         "summary": "Delete food information by food ID (얘는 안 쓸 듯)",
         "parameters": 
           {
             "name": "f_id",
-            "in": "body",
-            "description": "ID of the food (Explain : 4)",
+            "in": "path",
+            "description": "ID of the food(Explain : 4)",
             "required": true,
             "schema": {
-              "type": "integer",
-              "properties": {
-                "f_id": {
-                  "type": "integer",
-                  "example": 4
-                }
-              }
+              "type": "integer"
             }
           },
         "responses": {
@@ -274,7 +250,7 @@
         }
       }
     },
-    "/node/macronutrientRatio/day/{u_id}": {
+    "/node/macronutrientRatio/day/{u_id}/{date}": {
       "get": {
         "tags": ["Macronutrient Ratio"],
         "summary": "Get macronutrient ratio by user ID and date for a day",
@@ -288,17 +264,11 @@
           },
           {
             "name": "date",
-            "in": "body",
-            "description": "Date to calculate macronutrient ratio",
+            "in": "path",
+            "description": "Date to calculate macronutrient ratio (Explain : 2024-09-24)",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "date": {
-                  "type": "string",
-                  "example": "2024-09-24"
-                }
-              }
+              "type": "object"
             }
           }
         ],
@@ -382,7 +352,7 @@
         }
       }
     },
-    "/node/macronutrientRatio/week/{u_id}": {
+    "/node/macronutrientRatio/week/{u_id}/{date}": {
       "get": {
         "tags": ["Macronutrient Ratio"],
         "summary": "Get macronutrient ratio by user ID and date for a week",
@@ -396,8 +366,8 @@
           },
           {
             "name": "date",
-            "in": "body",
-            "description": "Start date to calculate weekly macronutrient ratio",
+            "in": "path",
+            "description": "Start date to calculate weekly macronutrient ratio (Explain : 2024-09-24)",
             "required": true,
             "schema": {
               "type": "object",
@@ -503,7 +473,7 @@
     }
 
     ,
-    "/node/macronutrientRatio/evaluate/{u_id}": {
+    "/node/macronutrientRatio/evaluate/{u_id}/{date}": {
       "get": {
         "tags": ["Macronutrient Ratio"],
         "summary": "Evaluate macronutrient intake compared to recommendation",
@@ -517,17 +487,11 @@
           },
           {
             "name": "date",
-            "in": "body",
+            "in": "path",
             "description": "Date to evaluate macronutrient intake",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "date": {
-                  "type": "string",
-                  "example": "2024-09-24"
-                }
-              }
+              "type": "object"
             }
           }
         ],
@@ -601,6 +565,47 @@
                     }
                   }
                 }
+              }
+            }
+          }
+        },
+        "/bot": {
+          "post": {
+            "tags": ["Chat Bot"],
+            "summary": "Connect to the chat bot and ask questions",
+            "description": "Creates a socket connection for the client to ask questions to the chatbot and receive responses.",
+            "parameters": [
+              {
+                "name": "message",
+                "in": "body",
+                "description": "Question to be answered by the chatbot",
+                "required": true,
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "msg": {
+                      "type": "string",
+                      "example": "What are some healthy foods for the liver?"
+                    }
+                  }
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Answer received from AI Bot",
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "answer": {
+                      "type": "string",
+                      "example": "Liver-friendly foods include carrots, sweet potatoes, and broccoli. Reducing processed foods and increasing water intake also benefits liver health."
+                    }
+                  }
+                }
+              },
+              "500": {
+                "description": "Failed to connect or send message"
               }
             }
           }

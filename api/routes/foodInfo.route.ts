@@ -8,5 +8,5 @@ export default ({ app } : { app : Router }) => {
     app.use('/foodInfo', route);
 
     route.get("/:f_id", Container.get(FoodInfoController).findFoodInfoById.bind(FoodInfoController));
-    route.delete("/", Container.get(FoodInfoController).deleteFoodInfoById.bind(FoodInfoController));
+    route.delete("/:f_id", Container.get(FoodInfoController).deleteFoodInfoById.bind(FoodInfoController));
 }
