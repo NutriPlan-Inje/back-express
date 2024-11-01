@@ -21,7 +21,7 @@ export class FoodInfoController {
     
     deleteFoodInfoById = async (req : Request, res : Response, next : NextFunction) => {
         try {
-            const f_id : number = parseInt(req.body.f_id);
+            const f_id : number = parseInt(req.params.f_id);
             const deleteFoodInfoResponseDTO : DeleteFoodInfoResponseDTO = await this.foodInfoService.deleteFoodInfoById({ f_id });
             return res.status(200).json(deleteFoodInfoResponseDTO);
         } catch (error) {

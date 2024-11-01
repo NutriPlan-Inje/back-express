@@ -12,7 +12,7 @@ export class DietPlanController {
 
     findDietPlanByDate = async (req: Request, res : Response, next : NextFunction) => {
         try {
-            const date : string = req.body.date;
+            const date : string = req.params.date;
             const u_id : number = parseInt(req.params.u_id);
             const dietPlanResponseDTO : DietPlanResponseDTO = await this.dietPlanService.findDietPlanByDateAndUid({ date, u_id  });
             return res.status(200).json(dietPlanResponseDTO);
@@ -23,7 +23,7 @@ export class DietPlanController {
 
     deleteDietPlanById = async (req : Request, res : Response, next : NextFunction) => {
         try {
-            const id : number = req.body.id;
+            const id : number = parseInt(req.params.id);
             const deleteDietPlanResponseDTO : DeleteDietPlanResponseDTO = await this.dietPlanService.deleteDietPlanById({ id });
             return res.status(200).json(deleteDietPlanResponseDTO);
         } catch (error) {

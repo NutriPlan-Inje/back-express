@@ -100,24 +100,18 @@
         }
       }
     },
-    "/node/dietPlan": {
+    "/node/dietPlan/{dietPlanID}": {
       "delete": {
         "tags": ["Diet Plan"],  
         "summary": "Delete diet plan by dietPlanID",
         "parameters": [
           {
             "name": "dietPlanID",
-            "in": "body",
+            "in": "path",
             "description": "dietPlanID to delete diet plan",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "dietPlan_id": {
-                  "type": "integer",
-                  "example": 4
-                }
-              }
+              "type": "object"
             }
           }
         ],
@@ -148,15 +142,15 @@
       }
     },
 
-    "/node/foodInfo/{f_id}/{date}": {
+    "/node/foodInfo/{f_id}": {
       "get": {
         "tags": ["Food Info"],  
         "summary": "Get food information by food ID",
         "parameters": 
           {
-            "name": "date",
+            "name": "foodId",
             "in": "path",
-            "description": "Date to retrieve diet plan (Explain : 2024-09-24)",
+            "description": "Date to retrieve diet plan (Explain : 4)",
             "required": true,
             "schema": {
               "type": "object"
@@ -219,24 +213,18 @@
       }
     },
 
-    "/node/foodInfo": {
+    "/node/foodInfo/{dietPlanID}": {
       "delete": {
         "tags": ["Food Info"],  
         "summary": "Delete food information by food ID (얘는 안 쓸 듯)",
         "parameters": 
           {
             "name": "f_id",
-            "in": "body",
+            "in": "path",
             "description": "ID of the food (Explain : 4)",
             "required": true,
             "schema": {
-              "type": "integer",
-              "properties": {
-                "f_id": {
-                  "type": "integer",
-                  "example": 4
-                }
-              }
+              "type": "integer"
             }
           },
         "responses": {
