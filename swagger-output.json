@@ -150,7 +150,7 @@
           {
             "name": "foodId",
             "in": "path",
-            "description": "Date to retrieve diet plan (Explain : 4)",
+            "description": "Date to retrieve diet plan (Explain : 2024-09-24)",
             "required": true,
             "schema": {
               "type": "object"
@@ -213,7 +213,7 @@
       }
     },
 
-    "/node/foodInfo/{dietPlanID}": {
+    "/node/foodInfo/{:f_id}": {
       "delete": {
         "tags": ["Food Info"],  
         "summary": "Delete food information by food ID (얘는 안 쓸 듯)",
@@ -221,7 +221,7 @@
           {
             "name": "f_id",
             "in": "path",
-            "description": "ID of the food (Explain : 4)",
+            "description": "ID of the food(Explain : 4)",
             "required": true,
             "schema": {
               "type": "integer"
