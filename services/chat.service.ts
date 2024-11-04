@@ -38,7 +38,7 @@ export default class ChatService {
         }
     }
 
-    async saveMessageToDB() {
+    saveMessageToDB = async() => {
         try {
             console.log("Starting saveMessageToDB...");
             const roomKeys = await this.redis.keys("room:*:messages");
@@ -71,7 +71,12 @@ export default class ChatService {
         }
     }
 
-    createChatRoom = async () => {
-        
+    createChatRoom = async ({ cr_id, title } : { cr_id : string, title : string}) => {
+        try{
+            this.chatRepository.createChatRoom({ cr_id, title });
+        } catch (error) {
+            console.error("create chatRoom Error : ", error);
+            throw error;
+        }
     }
 }
