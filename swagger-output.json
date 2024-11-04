@@ -100,7 +100,7 @@
         }
       }
     },
-    "/node/dietPlan/{dietPlanID}": {
+    "/node/dietPlan/{id}": {
       "delete": {
         "tags": ["Diet Plan"],  
         "summary": "Delete diet plan by dietPlanID",

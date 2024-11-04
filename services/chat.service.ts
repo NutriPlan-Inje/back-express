@@ -1,13 +1,21 @@
+import { Redis } from "ioredis";
 import { Pool } from "mysql2/promise";
 import OpenAI from "openai";
 import{ Service, Inject } from "typedi";
+import MessageDTO from "../dto/request/chat";
+import ChatRepository from "../repositoryes/chat.repository";
 
 @Service()
 export default class ChatService {
     constructor(
+        private readonly chatRepository : ChatRepository,
         @Inject("openai") private readonly openai : OpenAI, 
-        @Inject("pool") private readonly pool : Pool
-    ){}
+        @Inject("pool") private readonly pool : Pool,
+        @Inject("redis") private readonly redis : Redis,
+    ){
+        // 10분 간격으로 메시지를 저장을 한다.
+        setInterval(() => this.saveMessageToDB(), 1000 * 10) // 600000 m/s = 10분
+    }
     askQuestion = async (previousMessage : string | null, question : string) : Promise<string>  => {
         try{
             const fineTuningContent : string = previousMessage
@@ -29,6 +37,40 @@ export default class ChatService {
             return "openAI API 호출 중 오류 발생";
         }
     }
+
+    async saveMessageToDB() {
+        try {
+            console.log("Starting saveMessageToDB...");
+            const roomKeys = await this.redis.keys("room:*:messages");
+            const allMessages: MessageDTO[] = [];
+            console.log(roomKeys);
+            for (const key of roomKeys) {
+                const roomId = key.split(":")[1];
+                const messages = await this.redis.lrange(key, 0, -1);
+    
+                const messageData = messages.map((msg) => {
+                    const { timestamp, msg: content, senderName } = JSON.parse(msg);
+                    return {
+                        cr_id: roomId,
+                        createAt: Math.floor(timestamp / 1000), // 초 단위로 변환
+                        content,
+                        sender_name: senderName,
+                    } as MessageDTO;
+                });
+    
+                allMessages.push(...messageData);
+                await this.redis.del(key);
+            }
+    
+            if (allMessages.length > 0) {
+                console.log("Messages found, saving to DB...");
+                await this.chatRepository.saveMessages(allMessages); // MessageDTO[] 형식으로 전달
+            }
+        } catch (error) {
+            console.error("Error in saveMessageToDB:", error);
+        }
+    }
+
     createChatRoom = async () => {
         
     }
