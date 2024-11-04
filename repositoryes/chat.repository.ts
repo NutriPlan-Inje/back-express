@@ -31,4 +31,12 @@ export default class ChatRepository extends Repository {
             throw error;
         }
     }
+
+    async createChatRoom({ title, cr_id } : { title : string, cr_id : string}) {
+        const query = `
+            INSERT INTO chatRoom (id, title)
+            VALUES (?,?)
+        `;
+        this.executeQuery(query, [cr_id, title]);
+    }
 }
