@@ -6,6 +6,7 @@ import openaiLoader from './openai.loader';  // OpenAI 설정 로더
 import chatSocket from '../io/index';  // Socket.IO 설정
 import http from 'http';
 import { Application } from 'express';
+import redisLoader from './redis.loader';
 
 export default async function loaders({
     app,
@@ -16,10 +17,12 @@ export default async function loaders({
 }): Promise<void> {
     // 1️⃣ MySQL 및 OpenAI 인스턴스 로드
     const pool = await mysqlLoader();
+    
     const openai = await openaiLoader();
+    const redis = await redisLoader();
 
     // 2️⃣ 의존성 주입 (TypeDI 컨테이너에 등록)
-    await dependencyInjectionLoader({ pool, openai });
+    await dependencyInjectionLoader({ pool, openai, redis });
 
     // 3️⃣ Express 설정 적용
     await expressLoader({ app });

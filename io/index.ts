@@ -1,10 +1,10 @@
 import http from "http";
-import Redis from "ioredis";
 import { v4 as uuidv4 } from "uuid";
 import { Server, Socket } from "socket.io";
 import Container from "typedi";
 import ChatService from "../services/chat.service";
 import ChatRoomInfo from "../types/chat";
+import { Redis } from "ioredis";
 
 export default function init( server : http.Server) {
     const io = new Server(server, {
@@ -16,22 +16,18 @@ export default function init( server : http.Server) {
         },
     });
     const chatService: ChatService = Container.get(ChatService);
-    const redis = new Redis({
-        host : "127.0.0.1",
-        port : 6379
-    });
+    const redis : Redis = Container.get('redis');
 
     io.on("connection", async (socket : Socket) => {
-        let chatRoomInfo : ChatRoomInfo | null = null;
+        //let chatRoomInfo : ChatRoomInfo | null = null;
         console.log("user connected");
-
         
-        socket.on("create room", async() => {
+        socket.on("create room", async () => {
             const roomId = uuidv4();
-            await redis.set(`room:${roomId}`, JSON.stringify({ createdAt : Date.now() }));
+            await redis.set(`room:${roomId}`, JSON.stringify({ createdAt: Date.now() }));
             socket.emit("room created", { roomId });
-            console.log(`room ${roomId} created`)
-        })
+            console.log(`Room ${roomId} created`);
+        });
 
         socket.on("join room", async (roomId: string) => {
             try {
@@ -39,11 +35,10 @@ export default function init( server : http.Server) {
                 if (!roomExists) {
                     return socket.emit("error", { message: `Room ${roomId} does not exist` });
                 }
-        
+
                 await redis.sadd(`room:${roomId}:members`, socket.id);
-                socket.join(`room-${roomId}`); // 클라이언트 소켓을 방에 추가
-                socket.emit("room joined", { roomId }); // 방 참여 성공 메시지
-        
+                socket.join(`room-${roomId}`);
+                socket.emit("room joined", { roomId });
                 console.log(`Client ${socket.id} joined room ${roomId}`);
             } catch (error) {
                 console.error("Error joining room:", error);
@@ -51,26 +46,32 @@ export default function init( server : http.Server) {
             }
         });
 
-        socket.on("chat message", async ({roomId, msg} : {roomId : string, msg : string}) => {
-            try{
-                console.log(`Message received in room ${roomId} : `, msg);
-                const answer = await chatService.askQuestion(null, msg);
+        socket.on("chat message", async ({ roomId, msg }: { roomId: string; msg: string }) => {
+            try {
+                const timestamp: number = Date.now();
+                const messageData = JSON.stringify({ timestamp, msg, senderName: socket.id });
 
-                io.to(`room-${roomId}`).emit("chat message",{ roomId, answer });
-                console.log(`AI responded in room ${roomId} : ${answer}`);
+                await redis.rpush(`room:${roomId}:messages`, messageData);
+                await redis.expire(`room:${roomId}:messages`, 3600); // TTL of 1 hour
 
+                console.log(`Message received in room ${roomId}:`, msg);
+
+                //const answer = await chatService.askQuestion(null, msg);
+                const answer = "나의 대답이다!!"
+                io.to(`room-${roomId}`).emit("chat message", { roomId, answer });
+                console.log(`AI responded in room ${roomId}: ${answer}`);
             } catch (error) {
                 console.error("Failed to send AI response", error);
-                io.to(`room-${roomId}`).emit("chat message", {err : "failed send message"});
+                io.to(`room-${roomId}`).emit("chat message", { err: "failed to send message" });
             }
         });
 
-        socket.on("disconnect", async () =>{
+        socket.on("disconnect", async () => {
             const roomKeys = await redis.keys("room:*:members");
             for (const key of roomKeys) {
                 await redis.srem(key, socket.id);
             }
             console.log(`User ${socket.id} disconnected`);
-        })
+        });
     })
 }
