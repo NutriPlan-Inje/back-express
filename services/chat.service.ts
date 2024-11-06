@@ -14,8 +14,10 @@ export default class ChatService {
         @Inject("redis") private readonly redis : Redis,
     ){
         // 10분 간격으로 메시지를 저장을 한다.
-        setInterval(() => this.saveMessageToDB(), 1000 * 10) // 600000 m/s = 10분
+        //TODO: test하며 시간 조절
+        setInterval(() => this.saveMessageToDB(), 1000 * 60 * 10) // 600000 m/s = 10분
     }
+    
     askQuestion = async (previousMessage : string | null, question : string) : Promise<string>  => {
         try{
             const fineTuningContent : string = previousMessage
