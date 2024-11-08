@@ -1,6 +1,5 @@
 import { Request, Response ,NextFunction } from "express";
 import { Inject, Service } from "typedi";
-import DietPlanRequestDTO from "../../dto/request/dietPlan";
 import { DeleteDietPlanResponseDTO, DietPlanResponseDTO } from "../../dto/response/dietPlan";
 import DietPlanService from "../../services/dietPlan.service";
 
