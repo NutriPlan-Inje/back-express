@@ -35,8 +35,6 @@
 <body>
     <h1>Chat Room Test Client</h1>
 
-    <input type="text" id="titleInput" placeholder="Enter room title" />
-
     <div>
         <button id="createRoomBtn">Create & Join Room</button>
     </div>
@@ -50,23 +48,16 @@
 
     <script>
         // 정확한 URL로 설정
-        const socket = io("http://localhost:8000", { path: "/bot" });
+        const socket = io("http://localhost:8080", { path: "/bot" });
 
         const messagesDiv = document.getElementById("messages");
         const messageInput = document.getElementById("messageInput");
-        const titleInput = document.getElementById("titleInput");
         const roomInfoDiv = document.getElementById("roomInfo");
 
         let currentRoomId = null;
 
         document.getElementById("createRoomBtn").addEventListener("click", () => {
-            const roomTitle = titleInput.value.trim();
-            if (!roomTitle) {
-                logMessage("⚠️ Please enter a room title.");
-                return;
-            }
-
-            socket.emit("create room", { title: roomTitle });
+            socket.emit("create room");
         });
 
         socket.on("room created", (data) => {
@@ -75,7 +66,7 @@
         });
 
         socket.on("room joined", (data) => {
-            roomInfoDiv.innerHTML = `<p>Joined Room: ${data.cr_id} - ${data.title}</p>`;
+            roomInfoDiv.innerHTML = `<p>Joined Room: ${data.cr_id}</p>`;
             logMessage(`✅ Successfully joined room: ${data.cr_id}`);
         });
 

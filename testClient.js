@@ -11,7 +11,7 @@ const rl = readline.createInterface({
 });
 
 // Connect to the server
-const socket = io("http://localhost:8080", { path: "/bot" });
+const socket = io("http://43.203.239.235:8080", { path: "/bot" });
 
 let currentRoomId = null;
 
