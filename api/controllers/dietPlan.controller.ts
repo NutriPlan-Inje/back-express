@@ -13,7 +13,11 @@ export class DietPlanController {
         try {
             const date : string = req.params.date;
             const u_id : number = parseInt(req.params.u_id);
-            const dietPlanResponseDTO : DietPlanResponseDTO = await this.dietPlanService.findDietPlanByDateAndUid({ date, u_id  });
+            const dietPlanResponseDTO : DietPlanResponseDTO | null = await this.dietPlanService.findDietPlanByDateAndUid({ date, u_id  });
+
+            if(dietPlanResponseDTO === null){
+                return res.status(404).json(dietPlanResponseDTO);
+            }
             return res.status(200).json(dietPlanResponseDTO);
         } catch (error) {
             return next(error);
