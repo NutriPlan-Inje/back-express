@@ -27,7 +27,7 @@ export default class DietPlanService {
 
         return result;
     }
-    async findDietPlanByDateAndUid( { date, u_id } : { date : string, u_id : number }) : Promise<DietPlanResponseDTO | null> {
+    async findDietPlanByDateAndUid( { date, u_id } : { date : string, u_id : number }) : Promise<DietPlanResponseDTO> {
         try{
             const dietPlans : DietPlanDTO[] = await this.dietPlanRepository.findDietPlanByDateAndUid({date, u_id});
             if(dietPlans.length === 0){
@@ -38,7 +38,11 @@ export default class DietPlanService {
             return dietPlanResponseDTO;
         } catch (error) {
             console.error(error);
-            return null;
+            return {
+                statusCode : 404,
+                message : '조회에 실패했습니다',
+                data : []
+            } as DietPlanResponseDTO;
         }
     }
 
